@@ -1,0 +1,17 @@
+version: "3"
+services:
+  react:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # イメージ名の指定
+    image: react-todo
+    # コンテナ名の指定
+    container_name: react-todo
+    volumes:
+      - ./:/usr/src/app
+    working_dir: /usr/src/app
+    command: sh -c "cd react-app && yarn install && yarn start"
+    ports:
+      - "3000:3000"
+    stdin_open: true
