@@ -4,6 +4,7 @@ import { InboxIcon, DraftsIcon } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
 
 //ToDo Grid Layout使う
+//ToDo ListItemをループで回す
 //! classを使用しない
 
 const useStyles = makeStyles((theme) => ({
@@ -20,10 +21,6 @@ const useStyles = makeStyles((theme) => ({
         margin: theme.spacing(4, 0, 2),
     },
 }));
-
-function ListItemLink(props) {
-    return <ListItem button component="a" {...props} />;
-}
 
 function TodoListItem(props) {
 
@@ -51,20 +48,20 @@ function TodoListItem(props) {
 
 function TodoList() {
     const classes = useStyles();
+    const [itemList, setItemList] = useState(['Drafts', 'Trash', 'Spam']);
+    const items = itemList.map((name) => {
+        return (
+            <TodoListItem text={name} />
+        );
+    });
 
     return (
         <div className={classes.root}>
             <Typography variant='h6' className={classes.title}>
                 ToDo
             </Typography>
-            <List
-                component="nav"
-            >
-                <TodoListItem text='test' />
-                <TodoListItem text='Drafts' />
-                <TodoListItem text='Trash' />
-                <TodoListItem text='Spam' />
-                {/* <TodoListItem /> */}
+            <List component="nav">
+                {items}
             </List>
         </div>
     );
