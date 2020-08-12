@@ -1,32 +1,11 @@
 import React, { useState } from 'react';
 import { Typography, List, ListItem, ListItemIcon, ListItemText, Divider, Checkbox, TextField, Button } from '@material-ui/core';
 import { InboxIcon, DraftsIcon } from '@material-ui/icons';
-import { makeStyles } from '@material-ui/core/styles';
+import useStyles from './style';
 
 //ToDo Grid Layout使う
-//ToDo ListItemをループで回す
+//ToDo delete機能の実装
 //! classを使用しない
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        position: 'absolute',
-        left: '50%',
-        transform: 'translate(-50%, 0%)',
-        width: '100%',
-        maxWidth: 900,
-        backgroundColor: theme.palette.background.paper,
-        textAlign: 'center',
-    },
-    title: {
-        margin: theme.spacing(4, 0, 2),
-    },
-    textField: {
-        width: '100%',
-    },
-    form: {
-        margin: theme.spacing(4, 0),
-    },
-}));
 
 function TodoListItem(props) {
 
