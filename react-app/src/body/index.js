@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Typography, List, ListItem, ListItemIcon, ListItemText, Divider, Checkbox } from '@material-ui/core';
+import { Typography, List, ListItem, ListItemIcon, ListItemText, Divider, Checkbox, TextField, Button } from '@material-ui/core';
 import { InboxIcon, DraftsIcon } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -20,6 +20,12 @@ const useStyles = makeStyles((theme) => ({
     title: {
         margin: theme.spacing(4, 0, 2),
     },
+    textField: {
+        width: '100%',
+    },
+    form: {
+        margin: theme.spacing(4, 0),
+    },
 }));
 
 function TodoListItem(props) {
@@ -32,7 +38,7 @@ function TodoListItem(props) {
                 <Checkbox
                     checked={checked}
                     onChange={() => setChecked(!checked)}
-                    value="checkedA"
+                    value="checked"
                     color="primary"
                     // indeterminate
                     inputProps={{
@@ -49,11 +55,23 @@ function TodoListItem(props) {
 function TodoList() {
     const classes = useStyles();
     const [itemList, setItemList] = useState(['Drafts', 'Trash', 'Spam']);
-    const items = itemList.map((name) => {
+    const [textState, setTextState] = useState('');
+    const items = itemList.map((name, index) => {
         return (
-            <TodoListItem text={name} />
+            <TodoListItem text={name} key={index} />
         );
     });
+    const addTodo = () => {
+        const newItemList = itemList.slice();
+        newItemList.push(textState);
+        setItemList(newItemList);
+        setTextState('');
+        console.log(newItemList);
+    }
+    const handleOnChange = (event) => {
+        setTextState(event.target.value);
+        // console.log(textState);
+    }
 
     return (
         <div className={classes.root}>
@@ -62,6 +80,10 @@ function TodoList() {
             </Typography>
             <List component="nav">
                 {items}
+                <ListItem className={classes.form}>
+                    <TextField label="ToDo" value={textState} onChange={event => handleOnChange(event)} className={classes.textField} />
+                    <Button variant='outlined' onClick={() => addTodo()}>add</Button>
+                </ListItem>
             </List>
         </div>
     );
