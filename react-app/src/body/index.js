@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Typography from '@material-ui/core/Typography';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -8,6 +8,7 @@ import Divider from '@material-ui/core/Divider';
 import InboxIcon from '@material-ui/icons/Inbox';
 import DraftsIcon from '@material-ui/icons/Drafts';
 import { makeStyles } from '@material-ui/core/styles';
+import Checkbox from '@material-ui/core/Checkbox';
 
 //ToDo Grid Layout使う
 //! classを使用しない
@@ -28,31 +29,45 @@ function ListItemLink(props) {
 }
 
 function SimpleList() {
+    const [state, setState] = useState({
+        checkedA: false,
+        checkedB: false,
+        checkedF: false,
+    });
+
+    const handleChange = name => event => {
+        setState({ ...state, [name]: event.target.checked });
+    };
+
     const classes = useStyles();
     return (
         <div className={classes.root}>
-            <List component="nav" aria-label="main mailbox folders">
-                <ListItem button>
-                    <ListItemIcon>
-                        <InboxIcon />
-                    </ListItemIcon>
+            <List component="nav">
+                <ListItem>
+                    <Checkbox
+                        checked={state.checkedA}
+                        onChange={handleChange('checkedA')}
+                        value="checkedA"
+                        // color="primary"
+                        // indeterminate
+                        inputProps={{
+                            'aria-label': 'primary checkbox',
+                        }}
+                    />
                     <ListItemText primary="Inbox" />
                 </ListItem>
-                <ListItem button>
-                    <ListItemIcon>
-                        <DraftsIcon />
-                    </ListItemIcon>
+                <Divider />
+                <ListItem>
                     <ListItemText primary="Drafts" />
                 </ListItem>
-            </List>
-            <Divider />
-            <List component="nav" aria-label="secondary mailbox folders">
-                <ListItem button>
+                <Divider />
+                <ListItem>
                     <ListItemText primary="Trash" />
                 </ListItem>
-                <ListItemLink href="#simple-list">
+                <Divider />
+                <ListItem>
                     <ListItemText primary="Spam" />
-                </ListItemLink>
+                </ListItem>
             </List>
         </div>
     );
