@@ -5,7 +5,7 @@ import { HighlightOff } from '@material-ui/icons';
 import useStyles from './style';
 
 //ToDo Grid Layout使う
-//ToDo delete機能の実装
+//ToDo edit機能の確定した際の挙動を実装
 //! classを使用しない
 //! 子要素をmapで展開するならStateは親要素で管理しないとおかしくなる
 
@@ -25,7 +25,7 @@ function TodoListItem(props) {
                     }}
                 />
                 {props.item.edit ? (
-                    <TextField className={classes.textField + ' ' + classes.del_underline} borderBottom={0} />
+                    <TextField defaultValue={props.item.text} className={classes.textField + ' ' + classes.del_underline} borderBottom={0} />
                 ) : (
                         <ListItemText primary={props.item.text} />
                     )
