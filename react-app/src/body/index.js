@@ -32,14 +32,14 @@ function TodoListItem(props) {
                         <Button>
                             edit
                         </Button>
-                        <Button color="secondary" style={{ color: red[800] }}>
+                        <Button color="secondary" style={{ color: red[800] }} onClick={() => props.delete(props.index)}>
                             delete
                     </Button>
                     </ButtonGroup>
                 ) : null}
             </ListItem>
             <Divider />
-        </React.Fragment>
+        </React.Fragment >
     )
 }
 
@@ -49,7 +49,7 @@ function TodoList() {
     const [textState, setTextState] = useState('');
     const items = itemList.map((name, index) => {
         return (
-            <TodoListItem text={name} key={index} />
+            <TodoListItem text={name} key={index} index={index} delete={i => deleteTodo(i)} />
         );
     });
     const addTodo = () => {
@@ -57,7 +57,13 @@ function TodoList() {
         newItemList.push(textState);
         setItemList(newItemList);
         setTextState('');
-        console.log(newItemList);
+        // console.log(newItemList);
+    }
+    const deleteTodo = (i) => {
+        const newItemList = itemList.slice();
+        newItemList.splice(i, 1);
+        setItemList(newItemList);
+        console.log(i)
     }
     const handleOnChange = (event) => {
         setTextState(event.target.value);
