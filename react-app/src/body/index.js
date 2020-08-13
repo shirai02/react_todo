@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Typography, List, ListItem, ListItemIcon, ListItemText, Divider, Checkbox, TextField, Button } from '@material-ui/core';
-import { InboxIcon, DraftsIcon } from '@material-ui/icons';
+import { Typography, List, ListItem, ListItemIcon, ListItemText, Divider, Checkbox, TextField, Button, ButtonGroup } from '@material-ui/core';
+import red from '@material-ui/core/colors/red'
+import { HighlightOff } from '@material-ui/icons';
 import useStyles from './style';
 
 //ToDo Grid Layout使う
@@ -10,6 +11,7 @@ import useStyles from './style';
 function TodoListItem(props) {
 
     const [checked, setChecked] = useState(false);
+    // const [displayButton, setDisplayButton] = useState(false);
 
     return (
         <React.Fragment>
@@ -25,6 +27,16 @@ function TodoListItem(props) {
                     }}
                 />
                 <ListItemText primary={props.text} />
+                {checked ? (
+                    <ButtonGroup aria-label="outlined primary button group">
+                        <Button>
+                            edit
+                        </Button>
+                        <Button color="secondary" style={{ color: red[800] }}>
+                            delete
+                    </Button>
+                    </ButtonGroup>
+                ) : null}
             </ListItem>
             <Divider />
         </React.Fragment>
