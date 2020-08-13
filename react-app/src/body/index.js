@@ -10,15 +10,15 @@ import useStyles from './style';
 
 function TodoListItem(props) {
 
-    const [checked, setChecked] = useState(false);
+    // const [checked, setChecked] = useState(false);
     // const [displayButton, setDisplayButton] = useState(false);
 
     return (
         <React.Fragment>
             <ListItem>
                 <Checkbox
-                    checked={checked}
-                    onChange={() => setChecked(!checked)}
+                    checked={props.checked}
+                    onChange={() => props.handleChecked(props.index)}
                     value="checked"
                     color="primary"
                     // indeterminate
@@ -27,7 +27,7 @@ function TodoListItem(props) {
                     }}
                 />
                 <ListItemText primary={props.text} />
-                {checked ? (
+                {props.checked ? (
                     <ButtonGroup aria-label="outlined primary button group">
                         <Button>
                             edit
@@ -47,9 +47,10 @@ function TodoList() {
     const classes = useStyles();
     const [itemList, setItemList] = useState(['Drafts', 'Trash', 'Spam']);
     const [textState, setTextState] = useState('');
+    const [checked, setChecked] = useState([false, false, false]);
     const items = itemList.map((name, index) => {
         return (
-            <TodoListItem text={name} key={index} index={index} delete={i => deleteTodo(i)} />
+            <TodoListItem text={name} key={index} index={index} checked={checked[index]} handleChecked={i => handleChecked(i)} delete={i => deleteTodo(i)} />
         );
     });
     const addTodo = () => {
@@ -57,17 +58,30 @@ function TodoList() {
         newItemList.push(textState);
         setItemList(newItemList);
         setTextState('');
+
+        const newChecked = checked.slice();
+        newChecked.push(false);
+        setChecked(newChecked);
         // console.log(newItemList);
     }
     const deleteTodo = (i) => {
         const newItemList = itemList.slice();
         newItemList.splice(i, 1);
         setItemList(newItemList);
-        console.log(i)
+
+        const newChecked = checked.slice();
+        newChecked.splice(i, 1);
+        setChecked(newChecked);
+        // console.log(i)
     }
     const handleOnChange = (event) => {
         setTextState(event.target.value);
         // console.log(textState);
+    }
+    const handleChecked = (i) => {
+        const newChecked = checked.slice();
+        newChecked.splice(i, 1, !newChecked[i]);
+        setChecked(newChecked);
     }
 
     return (
