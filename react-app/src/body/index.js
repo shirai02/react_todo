@@ -7,12 +7,10 @@ import useStyles from './style';
 //ToDo Grid Layout使う
 //ToDo delete機能の実装
 //! classを使用しない
+//! 子要素をmapで展開するならStateは親要素で管理しないとおかしくなる
 
 function TodoListItem(props) {
-
-    // const [checked, setChecked] = useState(false);
-    // const [displayButton, setDisplayButton] = useState(false);
-
+    const classes = useStyles();
     return (
         <React.Fragment>
             <ListItem>
@@ -26,7 +24,12 @@ function TodoListItem(props) {
                         'aria-label': 'primary checkbox',
                     }}
                 />
-                <ListItemText primary={props.item.text} />
+                {props.item.edit ? (
+                    <TextField className={classes.textField + ' ' + classes.del_underline} borderBottom={0} />
+                ) : (
+                        <ListItemText primary={props.item.text} />
+                    )
+                }
                 {props.item.checked ? (
                     <ButtonGroup aria-label="outlined primary button group">
                         <Button>
@@ -36,7 +39,12 @@ function TodoListItem(props) {
                             delete
                     </Button>
                     </ButtonGroup>
-                ) : null}
+                ) : (
+                        <Button variant='outlined' onClick={() => props.setEdit(props.index, !props.item.edit)}>
+                            edit
+                        </Button>
+                    )
+                }
             </ListItem>
             <Divider />
         </React.Fragment >
@@ -47,15 +55,15 @@ function TodoList() {
     const classes = useStyles();
     const [itemList, setItemList] = useState(
         [
-            { text: 'Drafts', checked: false },
-            { text: 'Trash', checked: false },
-            { text: 'Spam', checked: false },
+            { text: 'Drafts', checked: false, edit: false },
+            { text: 'Trash', checked: false, edit: false },
+            { text: 'Spam', checked: false, edit: false },
         ]
     );
     const [textState, setTextState] = useState('');
     const items = itemList.map((item, index) => {
         return (
-            <TodoListItem item={item} key={index} index={index} handleChecked={i => handleChecked(i)} delete={i => deleteTodo(i)} />
+            <TodoListItem item={item} key={index} index={index} handleChecked={i => handleChecked(i)} setEdit={(i, state) => setEdit(i, state)} delete={i => deleteTodo(i)} />
         );
     });
     const addTodo = () => {
@@ -75,7 +83,12 @@ function TodoList() {
     }
     const handleChecked = (i) => {
         const newItemList = itemList.slice();
-        newItemList.splice(i, 1, { text: newItemList[i].text, checked: !newItemList[i].checked });
+        newItemList.splice(i, 1, { text: newItemList[i].text, checked: !newItemList[i].checked, edit: newItemList[i].edit });
+        setItemList(newItemList);
+    }
+    const setEdit = (i, state) => {
+        const newItemList = itemList.slice();
+        newItemList.splice(i, 1, { text: newItemList[i].text, checked: newItemList[i].checked, edit: state });
         setItemList(newItemList);
     }
     const keyPress = (e) => {
