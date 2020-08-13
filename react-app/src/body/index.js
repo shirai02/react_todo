@@ -17,7 +17,7 @@ function TodoListItem(props) {
         <React.Fragment>
             <ListItem>
                 <Checkbox
-                    checked={props.checked}
+                    checked={props.item.checked}
                     onChange={() => props.handleChecked(props.index)}
                     value="checked"
                     color="primary"
@@ -26,8 +26,8 @@ function TodoListItem(props) {
                         'aria-label': 'primary checkbox',
                     }}
                 />
-                <ListItemText primary={props.text} />
-                {props.checked ? (
+                <ListItemText primary={props.item.text} />
+                {props.item.checked ? (
                     <ButtonGroup aria-label="outlined primary button group">
                         <Button>
                             edit
@@ -45,43 +45,43 @@ function TodoListItem(props) {
 
 function TodoList() {
     const classes = useStyles();
-    const [itemList, setItemList] = useState(['Drafts', 'Trash', 'Spam']);
+    const [itemList, setItemList] = useState(
+        [
+            { text: 'Drafts', checked: false },
+            { text: 'Trash', checked: false },
+            { text: 'Spam', checked: false },
+        ]
+    );
     const [textState, setTextState] = useState('');
-    const [checked, setChecked] = useState([false, false, false]);
-    const items = itemList.map((name, index) => {
+    const items = itemList.map((item, index) => {
         return (
-            <TodoListItem text={name} key={index} index={index} checked={checked[index]} handleChecked={i => handleChecked(i)} delete={i => deleteTodo(i)} />
+            <TodoListItem item={item} key={index} index={index} handleChecked={i => handleChecked(i)} delete={i => deleteTodo(i)} />
         );
     });
     const addTodo = () => {
         const newItemList = itemList.slice();
-        newItemList.push(textState);
+        newItemList.push({ text: textState, checked: false });
         setItemList(newItemList);
         setTextState('');
-
-        const newChecked = checked.slice();
-        newChecked.push(false);
-        setChecked(newChecked);
-        // console.log(newItemList);
     }
     const deleteTodo = (i) => {
         const newItemList = itemList.slice();
         newItemList.splice(i, 1);
         setItemList(newItemList);
-
-        const newChecked = checked.slice();
-        newChecked.splice(i, 1);
-        setChecked(newChecked);
-        // console.log(i)
     }
-    const handleOnChange = (event) => {
+    const handleOnChangeText = (event) => {
         setTextState(event.target.value);
         // console.log(textState);
     }
     const handleChecked = (i) => {
-        const newChecked = checked.slice();
-        newChecked.splice(i, 1, !newChecked[i]);
-        setChecked(newChecked);
+        const newItemList = itemList.slice();
+        newItemList.splice(i, 1, { text: newItemList[i].text, checked: !newItemList[i].checked });
+        setItemList(newItemList);
+    }
+    const keyPress = (e) => {
+        if (e.keyCode === 13) {
+            addTodo();
+        }
     }
 
     return (
@@ -92,7 +92,7 @@ function TodoList() {
             <List component="nav">
                 {items}
                 <ListItem className={classes.form}>
-                    <TextField label="ToDo" value={textState} onChange={event => handleOnChange(event)} className={classes.textField} />
+                    <TextField label="ToDo" value={textState} onChange={event => handleOnChangeText(event)} onKeyDown={event => keyPress(event)} className={classes.textField} />
                     <Button variant='outlined' onClick={() => addTodo()}>add</Button>
                 </ListItem>
             </List>
