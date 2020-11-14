@@ -1,6 +1,7 @@
-import React, { useState, useCallback, useRef, FC } from "react"
+import React, { useState, useCallback, useRef } from "react"
 import { useDrag, useDrop, DndProvider } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
+import { TouchBackend }from "react-dnd-touch-backend"
 
 const DND_GROUP = "list"
 
