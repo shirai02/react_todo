@@ -4,11 +4,13 @@ import './index.css';
 // import App from './App';
 import ToDo from './body'
 import * as serviceWorker from './serviceWorker';
+import SortableList from './test/dnd';
 
 ReactDOM.render(
   <React.StrictMode>
     {/* <App /> */}
-    <ToDo />
+    {/* <ToDo /> */}
+    <SortableList />
   </React.StrictMode>,
   document.getElementById('root')
 );
