@@ -9,8 +9,8 @@ import SortableList from './test/dnd';
 ReactDOM.render(
   <React.StrictMode>
     {/* <App /> */}
-    {/* <ToDo /> */}
-    <SortableList />
+    <ToDo />
+    {/* <SortableList /> */}
   </React.StrictMode>,
   document.getElementById('root')
 );
