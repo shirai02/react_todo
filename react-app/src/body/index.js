@@ -5,12 +5,21 @@ import { HighlightOff } from '@material-ui/icons';
 import useStyles from './style';
 
 //ToDo Grid Layout使う
-//ToDo edit機能の確定した際の挙動を実装
 //! classを使用しない
 //! 子要素をmapで展開するならStateは親要素で管理しないとおかしくなる
 
 function TodoListItem(props) {
     const classes = useStyles();
+    const [textState, setTextState] = useState(props.item.text);
+    const handleOnChangeText = (event) => {
+        setTextState(event.target.value);
+        // console.log(textState);
+    }
+    const keyPress = (e) => {
+        if (e.keyCode === 13) {
+            props.setEdit(props.index, false, textState);
+        }
+    }
     return (
         <React.Fragment>
             <ListItem>
@@ -25,14 +34,14 @@ function TodoListItem(props) {
                     }}
                 />
                 {props.item.edit ? (
-                    <TextField defaultValue={props.item.text} className={classes.textField + ' ' + classes.del_underline} borderBottom={0} />
+                    <TextField defaultValue={props.item.text} onChange={event => handleOnChangeText(event)} onKeyDown={event => keyPress(event)} className={classes.textField + ' ' + classes.del_underline} borderBottom={0} />
                 ) : (
                         <ListItemText primary={props.item.text} />
                     )
                 }
                 {props.item.checked ? (
                     <ButtonGroup aria-label="outlined primary button group">
-                        <Button>
+                        <Button variant='outlined' onClick={() => props.setEdit(props.index, !props.item.edit, textState)}>
                             edit
                         </Button>
                         <Button color="secondary" style={{ color: red[800] }} onClick={() => props.delete(props.index)}>
@@ -40,7 +49,7 @@ function TodoListItem(props) {
                     </Button>
                     </ButtonGroup>
                 ) : (
-                        <Button variant='outlined' onClick={() => props.setEdit(props.index, !props.item.edit)}>
+                        <Button variant='outlined' onClick={() => props.setEdit(props.index, !props.item.edit, textState)}>
                             edit
                         </Button>
                     )
@@ -63,7 +72,7 @@ function TodoList() {
     const [textState, setTextState] = useState('');
     const items = itemList.map((item, index) => {
         return (
-            <TodoListItem item={item} key={index} index={index} handleChecked={i => handleChecked(i)} setEdit={(i, state) => setEdit(i, state)} delete={i => deleteTodo(i)} />
+            <TodoListItem item={item} key={index} index={index} handleChecked={i => handleChecked(i)} setEdit={(i, state, text) => setEdit(i, state, text)} delete={i => deleteTodo(i)} />
         );
     });
     const addTodo = () => {
@@ -86,10 +95,15 @@ function TodoList() {
         newItemList.splice(i, 1, { text: newItemList[i].text, checked: !newItemList[i].checked, edit: newItemList[i].edit });
         setItemList(newItemList);
     }
-    const setEdit = (i, state) => {
+    const setEdit = (i, state, text) => {
         const newItemList = itemList.slice();
-        newItemList.splice(i, 1, { text: newItemList[i].text, checked: newItemList[i].checked, edit: state });
+        if (state) {
+            newItemList.splice(i, 1, { text: newItemList[i].text, checked: newItemList[i].checked, edit: state });
+        } else {
+            newItemList.splice(i, 1, { text: text, checked: newItemList[i].checked, edit: state });
+        }
         setItemList(newItemList);
+        // console.log(text);
     }
     const keyPress = (e) => {
         if (e.keyCode === 13) {
