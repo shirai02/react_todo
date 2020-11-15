@@ -1,12 +1,12 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import Board from './Board'
+import observe from './Game'
 
 // ToDo ゲーム状態の追加から
 
-export default function DnDTutorial() {
-    return(
-        <React.Fragment>
-            <Board knightPosition={[7,4]} />
-        </React.Fragment>
-    )
-}
+const root = document.getElementById('root')
+
+observe((knightPosition) =>
+  ReactDOM.render(<Board knightPosition={knightPosition} />, root)
+)
