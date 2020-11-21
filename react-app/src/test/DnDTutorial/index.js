@@ -1,12 +1,14 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React,{useEffect, useState} from 'react'
 import Board from './Board'
-import observe from './Game'
+import {observe} from './Game'
 
-// ToDo ゲーム状態の追加から
-
-const root = document.getElementById('root')
-
-observe((knightPosition) =>
-  ReactDOM.render(<Board knightPosition={knightPosition} />, root)
-)
+export default function TutorialApp() {
+  const [knightPos, setKnightPos] = useState([1, 7]);
+  // the observe function will return an unsubscribe callback
+  useEffect(() => observe((newPos) => setKnightPos(newPos)));
+  return (
+    <div>
+        <Board knightPosition={knightPos}/>
+    </div>
+  );
+};

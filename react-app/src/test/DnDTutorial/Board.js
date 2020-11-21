@@ -1,49 +1,46 @@
-import React from 'react'
-import { canMoveKnight, moveKnight } from './Game'
+import React from 'react';
+import { DndProvider } from 'react-dnd'
+import {HTML5Backend} from 'react-dnd-html5-backend'
+import BoardSquare from './BoardSquare'
 import Knight from './Knight'
-import Square from './Square'
 
-export default function Board({ knightPosition }) {
-    const squares = []
-    for (let i = 0; i < 64; i++) {
-        squares.push(renderSquare(i, knightPosition))
-    }
-    console.log(squares)
-    return(
-        <div
-            style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '90%',
-                height: '90%',
-                margin: '5%, 5%, 5%, 5%',
-                display: 'flex',
-                flexWrap: 'wrap'
-            }}
-        >
-            {squares}
-        </div>
-    )
-}
-
+const boardStyle = {
+	width: 500,
+	height: 500,
+	border: '1px solid gray',
+	display: 'flex',
+	flexWrap: 'wrap'
+};
+const squareStyle = { width: '12.5%', height: '12.5%'};
 function renderSquare(i, [knightX, knightY]) {
-    const x = i % 8
-    const y = Math.floor(i / 8)
-    const black = (x + y) % 2 === 1
-    const isKnightHere = knightX === x && knightY === y
-    const piece = isKnightHere ? <Knight /> : null
-    
-    return (
-        <div onClick={() => handleSquareClick(x, y)} key={i} style={{ width: '12.5%', height: '12.5%' }}>
-            <Square black={black}>{piece}</Square>
-        </div>
-    )
+	const x = i % 8;
+	const y = Math.floor(i / 8);
+	return (
+		<div
+			key={i}
+			style={squareStyle}
+		>
+			<BoardSquare x={x} y={y}>
+				{renderPiece(x, y, [knightX, knightY])}
+			</BoardSquare>
+		</div>
+	);
 }
-
-function handleSquareClick(toX, toY) {
-    if (canMoveKnight(toX, toY)){
-        moveKnight(toX, toY)
-    }
+function renderPiece(x, y, [knightX, knightY]) {
+	const isKnightHere = knightX === x && knightY === y
+	return isKnightHere ? <Knight /> : null
 }
+function Board({ knightPosition }) {
+	const squares = []
+	for (let i = 0; i < 64; i++) {
+		squares.push(renderSquare(i, knightPosition))
+	}
+	return (
+		<DndProvider backend={HTML5Backend}>
+			<div style={boardStyle}>
+				{squares}
+			</div>
+		</DndProvider>
+	);
+}
+export default Board;

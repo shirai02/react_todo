@@ -5,14 +5,18 @@
 // import ToDo from './body'
 // import * as serviceWorker from './serviceWorker';
 // import SortableList from './test/dnd';
-// import DnDTutorial from './test/DnDTutorial';
+// import TutorialApp from './test/DnDTutorial/index';
+// import {DndProvier} from 'react-dnd'
+// import {HTML5Backend} from 'react-dnd-html5-backend'
 
 // ReactDOM.render(
 //   <React.StrictMode>
 //     {/* <App /> */}
 //     {/* <ToDo /> */}
 //     {/* <SortableList /> */}
-//     <DnDTutorial />
+//     <DndProvier backend={HTML5Backend}>
+//       <TutorialApp />
+//     </DndProvier>
 //   </React.StrictMode>,
 //   document.getElementById('root')
 // );
