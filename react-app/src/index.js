@@ -6,17 +6,13 @@ import ToDo from './body'
 import * as serviceWorker from './serviceWorker';
 // import SortableList from './test/dnd';
 import DnDTutorial from './test/DnDTutorial';
-import {DndProvider} from 'react-dnd'
-import {HTML5Backend} from 'react-dnd-html5-backend'
 
 ReactDOM.render(
   <React.StrictMode>
     {/* <App /> */}
     {/* <ToDo /> */}
     {/* <SortableList /> */}
-    <DndProvider backend={HTML5Backend}>
-      <DnDTutorial />
-    </DndProvider>
+    <DnDTutorial />
   </React.StrictMode>,
   document.getElementById('root')
 );
