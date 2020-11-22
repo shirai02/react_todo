@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { Typography, List, ListItem, ListItemIcon, ListItemText, Divider, Checkbox, TextField, Button, ButtonGroup } from '@material-ui/core';
 import red from '@material-ui/core/colors/red'
-import { HighlightOff } from '@material-ui/icons';
+import { Dehaze } from '@material-ui/icons';
 import useStyles from './style';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DndProvider, useDrag } from 'react-dnd';
+import { ItemTypes } from './Constants';
 
 //ToDo Grid Layout使う
 //! classを使用しない
@@ -20,9 +23,16 @@ function TodoListItem(props) {
             props.setEdit(props.index, false, textState);
         }
     }
+    const [{isDragging}, drag] = useDrag({
+        item: { type: ItemTypes.LISTITEM },
+        collect: monitor => ({
+            isDragging: !!monitor.isDragging(),
+        }),
+    })
     return (
         <React.Fragment>
-            <ListItem>
+            <ListItem ref={drag}>
+                <Dehaze />
                 <Checkbox
                     checked={props.item.checked}
                     onChange={() => props.handleChecked(props.index)}
@@ -117,7 +127,9 @@ function TodoList() {
                 ToDo
             </Typography>
             <List component="nav">
-                {items}
+                <DndProvider backend={HTML5Backend}>
+                    {items}
+                </DndProvider>
                 <ListItem className={classes.form}>
                     <TextField label="ToDo" value={textState} onChange={event => handleOnChangeText(event)} onKeyDown={event => keyPress(event)} className={classes.textField} />
                     <Button variant='outlined' onClick={() => addTodo()}>add</Button>

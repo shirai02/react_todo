@@ -10,9 +10,9 @@ import DnDTutorial from './test/DnDTutorial';
 ReactDOM.render(
   <React.StrictMode>
     {/* <App /> */}
-    {/* <ToDo /> */}
+    <ToDo />
     {/* <SortableList /> */}
-    <DnDTutorial />
+    {/* <DnDTutorial /> */}
   </React.StrictMode>,
   document.getElementById('root')
 );
