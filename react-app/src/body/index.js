@@ -69,11 +69,11 @@ function TodoListItem(props) {
             item.index = hoverIndex;
         }
     })
-    const opacity = isDragging ? 0:1
-    drag(drop(ref))
+    const opacity = isDragging ? 0:1;
+    drag(drop(ref));
     return (
         <React.Fragment>
-            <div ref={ref} style={{opacity}}>
+            <div ref={ref} >
                 <ListItem>
                     <Dehaze />
                     <Checkbox
@@ -92,6 +92,7 @@ function TodoListItem(props) {
                             <ListItemText primary={props.item.text} />
                         )
                     }
+                    {opacity}
                     {props.item.checked ? (
                         <ButtonGroup aria-label="outlined primary button group">
                             <Button variant='outlined' onClick={() => props.setEdit(props.index, !props.item.edit, textState)}>
@@ -118,9 +119,9 @@ function TodoList() {
     const classes = useStyles();
     const [itemList, setItemList] = useState(
         [
-            { text: 'Drafts', checked: false, edit: false },
-            { text: 'Trash', checked: false, edit: false },
-            { text: 'Spam', checked: false, edit: false },
+            { id:1, text: 'Drafts', checked: false, edit: false },
+            { id:2, text: 'Trash', checked: false, edit: false },
+            { id:3, text: 'Spam', checked: false, edit: false },
         ]
     );
     const moveItem = useCallback((dragIndex, hoverIndex) => {
@@ -135,7 +136,7 @@ function TodoList() {
     const [textState, setTextState] = useState('');
     const items = itemList.map((item, index) => {
         return (
-            <TodoListItem moveItem={moveItem} item={item} key={index} index={index} handleChecked={i => handleChecked(i)} setEdit={(i, state, text) => setEdit(i, state, text)} delete={i => deleteTodo(i)} />
+            <TodoListItem moveItem={moveItem} item={item} key={item.id} index={index} handleChecked={i => handleChecked(i)} setEdit={(i, state, text) => setEdit(i, state, text)} delete={i => deleteTodo(i)} />
         );
     });
     const addTodo = () => {
