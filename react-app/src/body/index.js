@@ -4,9 +4,11 @@ import red from '@material-ui/core/colors/red'
 import { Dehaze } from '@material-ui/icons';
 import useStyles from './style';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { TouchBackend }from "react-dnd-touch-backend"
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { ItemTypes } from './Constants';
 import update from 'immutability-helper';
+import { isMobile } from 'react-device-detect';
 
 //ToDo Grid Layout使う
 //Todo リスト内にidを付与するひつようあり
@@ -116,6 +118,7 @@ function TodoListItem(props) {
 
 function TodoList() {
     const classes = useStyles();
+    // const userAgent = req.headers['user-agent'];
     const [itemList, setItemList] = useState(
         [
             { id:1, text: 'Drafts', checked: false, edit: false },
@@ -179,10 +182,10 @@ function TodoList() {
     return (
         <div className={classes.root}>
             <Typography variant='h6' className={classes.title}>
-                ToDo
+                ToDo {isMobile ? 'mobile' : 'PC'}
             </Typography>
             <List component="nav">
-                <DndProvider backend={HTML5Backend}>
+                <DndProvider backend={isMobile ? TouchBackend : HTML5Backend}>
                     {items}
                 </DndProvider>
                 <ListItem className={classes.form}>
