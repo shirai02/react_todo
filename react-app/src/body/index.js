@@ -73,7 +73,7 @@ function TodoListItem(props) {
     drag(drop(ref));
     return (
         <React.Fragment>
-            <div ref={ref} >
+            <div ref={ref} style={{opacity}}>
                 <ListItem>
                     <Dehaze />
                     <Checkbox
@@ -92,7 +92,6 @@ function TodoListItem(props) {
                             <ListItemText primary={props.item.text} />
                         )
                     }
-                    {opacity}
                     {props.item.checked ? (
                         <ButtonGroup aria-label="outlined primary button group">
                             <Button variant='outlined' onClick={() => props.setEdit(props.index, !props.item.edit, textState)}>
