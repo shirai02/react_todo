@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Typography, List, ListItem, ListItemIcon, ListItemText, Divider, Checkbox, TextField, Button, ButtonGroup } from '@material-ui/core';
 import red from '@material-ui/core/colors/red'
 import { Dehaze } from '@material-ui/icons';
 import useStyles from './style';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { DndProvider, useDrag } from 'react-dnd';
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { ItemTypes } from './Constants';
+import update from 'immutability-helper';
 
 //ToDo Grid Layout使う
+//Todo ドラッグアンドドロップ実装
 //! classを使用しない
 //! 子要素をmapで展開するならStateは親要素で管理しないとおかしくなる
 
@@ -24,15 +26,55 @@ function TodoListItem(props) {
         }
     }
     const [{isDragging}, drag] = useDrag({
-        item: { type: ItemTypes.LISTITEM },
+        item: { type: ItemTypes.LISTITEM, index: props.index },
         collect: monitor => ({
             isDragging: !!monitor.isDragging(),
         }),
     })
+    const ref = useRef(null)
+    const [,drop] = useDrop({
+        accept: ItemTypes.LISTITEM,
+        hover(item,monitor){
+            if(!ref.current) {
+                return;
+            }
+            const dragIndex = item.index;
+            const hoverIndex = props.index;
+            if(dragIndex == hoverIndex) {
+                return;
+            }
+            const hoverBoundingRect = ref.current?.getBoundingClientRect();
+            // Get vertical middle
+            const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+            // Determine mouse position
+            const clientOffset = monitor.getClientOffset();
+            // Get pixels to the top
+            const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+            // Only perform the move when the mouse has crossed half of the items height
+            // When dragging downwards, only move when the cursor is below 50%
+            // When dragging upwards, only move when the cursor is above 50%
+            // Dragging downwards
+            if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+                return;
+            }
+            if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+                return;
+            }
+            // Time to actually perform the action
+            props.moveItem(dragIndex, hoverIndex);
+            // Note: we're mutating the monitor item here!
+            // Generally it's better to avoid mutations,
+            // but it's good here for the sake of performance
+            // to avoid expensive index searches.
+            item.index = hoverIndex;
+        }
+    })
+    const opacity = isDragging ? 0:1
+    drag(drop(ref))
     return (
         <React.Fragment>
-            <div style={{opacity: isDragging ? 0:1}}>
-                <ListItem ref={drag}>
+            <div ref={ref} style={{opacity}}>
+                <ListItem>
                     <Dehaze />
                     <Checkbox
                         checked={props.item.checked}
@@ -81,10 +123,19 @@ function TodoList() {
             { text: 'Spam', checked: false, edit: false },
         ]
     );
+    const moveItem = useCallback((dragIndex, hoverIndex) => {
+        const dragItem = itemList[dragIndex];
+        setItemList(update(itemList, {
+            $splice: [
+                [dragIndex, 1],
+                [hoverIndex, 0, dragItem],
+            ],
+        }));
+    }, [itemList]);
     const [textState, setTextState] = useState('');
     const items = itemList.map((item, index) => {
         return (
-            <TodoListItem item={item} key={index} index={index} handleChecked={i => handleChecked(i)} setEdit={(i, state, text) => setEdit(i, state, text)} delete={i => deleteTodo(i)} />
+            <TodoListItem moveItem={moveItem} item={item} key={index} index={index} handleChecked={i => handleChecked(i)} setEdit={(i, state, text) => setEdit(i, state, text)} delete={i => deleteTodo(i)} />
         );
     });
     const addTodo = () => {
