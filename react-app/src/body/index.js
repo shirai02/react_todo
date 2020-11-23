@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Typography, List, ListItem, ListItemIcon, ListItemText, Divider, Checkbox, TextField, Button, ButtonGroup } from '@material-ui/core';
 import red from '@material-ui/core/colors/red'
-import { HighlightOff } from '@material-ui/icons';
+import { Dehaze } from '@material-ui/icons';
 import useStyles from './style';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { ItemTypes } from './Constants';
+import update from 'immutability-helper';
 
 //ToDo Grid Layout使う
+//Todo リスト内にidを付与するひつようあり
 //! classを使用しない
 //! 子要素をmapで展開するならStateは親要素で管理しないとおかしくなる
 
@@ -20,42 +25,91 @@ function TodoListItem(props) {
             props.setEdit(props.index, false, textState);
         }
     }
+    const [{isDragging}, drag] = useDrag({
+        item: { type: ItemTypes.LISTITEM, index: props.index },
+        collect: monitor => ({
+            isDragging: !!monitor.isDragging(),
+        }),
+    })
+    const ref = useRef(null)
+    const [,drop] = useDrop({
+        accept: ItemTypes.LISTITEM,
+        hover(item,monitor){
+            if(!ref.current) {
+                return;
+            }
+            const dragIndex = item.index;
+            const hoverIndex = props.index;
+            if(dragIndex == hoverIndex) {
+                return;
+            }
+            const hoverBoundingRect = ref.current?.getBoundingClientRect();
+            // Get vertical middle
+            const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+            // Determine mouse position
+            const clientOffset = monitor.getClientOffset();
+            // Get pixels to the top
+            const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+            // Only perform the move when the mouse has crossed half of the items height
+            // When dragging downwards, only move when the cursor is below 50%
+            // When dragging upwards, only move when the cursor is above 50%
+            // Dragging downwards
+            if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+                return;
+            }
+            if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+                return;
+            }
+            // Time to actually perform the action
+            props.moveItem(dragIndex, hoverIndex);
+            // Note: we're mutating the monitor item here!
+            // Generally it's better to avoid mutations,
+            // but it's good here for the sake of performance
+            // to avoid expensive index searches.
+            item.index = hoverIndex;
+        }
+    })
+    const opacity = isDragging ? 0:1;
+    drag(drop(ref));
     return (
         <React.Fragment>
-            <ListItem>
-                <Checkbox
-                    checked={props.item.checked}
-                    onChange={() => props.handleChecked(props.index)}
-                    value="checked"
-                    color="primary"
-                    // indeterminate
-                    inputProps={{
-                        'aria-label': 'primary checkbox',
-                    }}
-                />
-                {props.item.edit ? (
-                    <TextField defaultValue={props.item.text} onChange={event => handleOnChangeText(event)} onKeyDown={event => keyPress(event)} className={classes.textField + ' ' + classes.del_underline} borderBottom={0} />
-                ) : (
-                        <ListItemText primary={props.item.text} />
-                    )
-                }
-                {props.item.checked ? (
-                    <ButtonGroup aria-label="outlined primary button group">
-                        <Button variant='outlined' onClick={() => props.setEdit(props.index, !props.item.edit, textState)}>
-                            edit
+            <div ref={ref} style={{opacity}}>
+                <ListItem>
+                    <Dehaze />
+                    <Checkbox
+                        checked={props.item.checked}
+                        onChange={() => props.handleChecked(props.index)}
+                        value="checked"
+                        color="primary"
+                        // indeterminate
+                        inputProps={{
+                            'aria-label': 'primary checkbox',
+                        }}
+                    />
+                    {props.item.edit ? (
+                        <TextField defaultValue={props.item.text} onChange={event => handleOnChangeText(event)} onKeyDown={event => keyPress(event)} className={classes.textField + ' ' + classes.del_underline} borderBottom={0} />
+                    ) : (
+                            <ListItemText primary={props.item.text} />
+                        )
+                    }
+                    {props.item.checked ? (
+                        <ButtonGroup aria-label="outlined primary button group">
+                            <Button variant='outlined' onClick={() => props.setEdit(props.index, !props.item.edit, textState)}>
+                                edit
+                            </Button>
+                            <Button color="secondary" style={{ color: red[800] }} onClick={() => props.delete(props.index)}>
+                                delete
                         </Button>
-                        <Button color="secondary" style={{ color: red[800] }} onClick={() => props.delete(props.index)}>
-                            delete
-                    </Button>
-                    </ButtonGroup>
-                ) : (
-                        <Button variant='outlined' onClick={() => props.setEdit(props.index, !props.item.edit, textState)}>
-                            edit
-                        </Button>
-                    )
-                }
-            </ListItem>
-            <Divider />
+                        </ButtonGroup>
+                    ) : (
+                            <Button variant='outlined' onClick={() => props.setEdit(props.index, !props.item.edit, textState)}>
+                                edit
+                            </Button>
+                        )
+                    }
+                </ListItem>
+                <Divider />
+            </div>
         </React.Fragment >
     )
 }
@@ -64,22 +118,33 @@ function TodoList() {
     const classes = useStyles();
     const [itemList, setItemList] = useState(
         [
-            { text: 'Drafts', checked: false, edit: false },
-            { text: 'Trash', checked: false, edit: false },
-            { text: 'Spam', checked: false, edit: false },
+            { id:1, text: 'Drafts', checked: false, edit: false },
+            { id:2, text: 'Trash', checked: false, edit: false },
+            { id:3, text: 'Spam', checked: false, edit: false },
         ]
     );
+    const moveItem = useCallback((dragIndex, hoverIndex) => {
+        const dragItem = itemList[dragIndex];
+        setItemList(update(itemList, {
+            $splice: [
+                [dragIndex, 1],
+                [hoverIndex, 0, dragItem],
+            ],
+        }));
+    }, [itemList]);
     const [textState, setTextState] = useState('');
     const items = itemList.map((item, index) => {
         return (
-            <TodoListItem item={item} key={index} index={index} handleChecked={i => handleChecked(i)} setEdit={(i, state, text) => setEdit(i, state, text)} delete={i => deleteTodo(i)} />
+            <TodoListItem moveItem={moveItem} item={item} key={item.id} index={index} handleChecked={i => handleChecked(i)} setEdit={(i, state, text) => setEdit(i, state, text)} delete={i => deleteTodo(i)} />
         );
     });
     const addTodo = () => {
         const newItemList = itemList.slice();
-        newItemList.push({ text: textState, checked: false });
+        const digest = new Date().toLocaleString();
+        newItemList.push({id: digest, text: textState, checked: false });
         setItemList(newItemList);
         setTextState('');
+        console.log(digest);
     }
     const deleteTodo = (i) => {
         const newItemList = itemList.slice();
@@ -117,7 +182,9 @@ function TodoList() {
                 ToDo
             </Typography>
             <List component="nav">
-                {items}
+                <DndProvider backend={HTML5Backend}>
+                    {items}
+                </DndProvider>
                 <ListItem className={classes.form}>
                     <TextField label="ToDo" value={textState} onChange={event => handleOnChangeText(event)} onKeyDown={event => keyPress(event)} className={classes.textField} />
                     <Button variant='outlined' onClick={() => addTodo()}>add</Button>
