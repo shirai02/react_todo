@@ -9,7 +9,7 @@ import { ItemTypes } from './Constants';
 import update from 'immutability-helper';
 
 //ToDo Grid Layout使う
-//Todo ドラッグアンドドロップ実装
+//Todo リスト内にidを付与するひつようあり
 //! classを使用しない
 //! 子要素をmapで展開するならStateは親要素で管理しないとおかしくなる
 
@@ -140,9 +140,11 @@ function TodoList() {
     });
     const addTodo = () => {
         const newItemList = itemList.slice();
-        newItemList.push({ text: textState, checked: false });
+        const digest = new Date().toLocaleString();
+        newItemList.push({id: digest, text: textState, checked: false });
         setItemList(newItemList);
         setTextState('');
+        console.log(digest);
     }
     const deleteTodo = (i) => {
         const newItemList = itemList.slice();
