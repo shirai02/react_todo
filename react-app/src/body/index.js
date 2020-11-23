@@ -31,41 +31,43 @@ function TodoListItem(props) {
     })
     return (
         <React.Fragment>
-            <ListItem ref={drag}>
-                <Dehaze />
-                <Checkbox
-                    checked={props.item.checked}
-                    onChange={() => props.handleChecked(props.index)}
-                    value="checked"
-                    color="primary"
-                    // indeterminate
-                    inputProps={{
-                        'aria-label': 'primary checkbox',
-                    }}
-                />
-                {props.item.edit ? (
-                    <TextField defaultValue={props.item.text} onChange={event => handleOnChangeText(event)} onKeyDown={event => keyPress(event)} className={classes.textField + ' ' + classes.del_underline} borderBottom={0} />
-                ) : (
-                        <ListItemText primary={props.item.text} />
-                    )
-                }
-                {props.item.checked ? (
-                    <ButtonGroup aria-label="outlined primary button group">
-                        <Button variant='outlined' onClick={() => props.setEdit(props.index, !props.item.edit, textState)}>
-                            edit
+            <div style={{opacity: isDragging ? 0:1}}>
+                <ListItem ref={drag}>
+                    <Dehaze />
+                    <Checkbox
+                        checked={props.item.checked}
+                        onChange={() => props.handleChecked(props.index)}
+                        value="checked"
+                        color="primary"
+                        // indeterminate
+                        inputProps={{
+                            'aria-label': 'primary checkbox',
+                        }}
+                    />
+                    {props.item.edit ? (
+                        <TextField defaultValue={props.item.text} onChange={event => handleOnChangeText(event)} onKeyDown={event => keyPress(event)} className={classes.textField + ' ' + classes.del_underline} borderBottom={0} />
+                    ) : (
+                            <ListItemText primary={props.item.text} />
+                        )
+                    }
+                    {props.item.checked ? (
+                        <ButtonGroup aria-label="outlined primary button group">
+                            <Button variant='outlined' onClick={() => props.setEdit(props.index, !props.item.edit, textState)}>
+                                edit
+                            </Button>
+                            <Button color="secondary" style={{ color: red[800] }} onClick={() => props.delete(props.index)}>
+                                delete
                         </Button>
-                        <Button color="secondary" style={{ color: red[800] }} onClick={() => props.delete(props.index)}>
-                            delete
-                    </Button>
-                    </ButtonGroup>
-                ) : (
-                        <Button variant='outlined' onClick={() => props.setEdit(props.index, !props.item.edit, textState)}>
-                            edit
-                        </Button>
-                    )
-                }
-            </ListItem>
-            <Divider />
+                        </ButtonGroup>
+                    ) : (
+                            <Button variant='outlined' onClick={() => props.setEdit(props.index, !props.item.edit, textState)}>
+                                edit
+                            </Button>
+                        )
+                    }
+                </ListItem>
+                <Divider />
+            </div>
         </React.Fragment >
     )
 }
