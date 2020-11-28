@@ -11,6 +11,8 @@ import update from 'immutability-helper';
 import { isMobile } from 'react-device-detect';
 
 //ToDo Grid Layout使う
+//ToDo editいる？
+//todo 一括削除
 //! classを使用しない
 //! 子要素をmapで展開するならStateは親要素で管理しないとおかしくなる
 
