@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Typography, List, ListItem, ListItemIcon, ListItemText, Divider, Checkbox, TextField, Button, ButtonGroup } from '@material-ui/core';
 import red from '@material-ui/core/colors/red'
 import { Dehaze } from '@material-ui/icons';
@@ -11,7 +11,7 @@ import update from 'immutability-helper';
 import { isMobile } from 'react-device-detect';
 
 //ToDo Grid Layout使う
-//Todo リスト内にidを付与するひつようあり
+//Todo ドラック時のui(useEffect)
 //! classを使用しない
 //! 子要素をmapで展開するならStateは親要素で管理しないとおかしくなる
 
@@ -27,10 +27,11 @@ function TodoListItem(props) {
             props.setEdit(props.index, false, textState);
         }
     }
-    const [{isDragging}, drag] = useDrag({
+    const [{isDragging, clientOffset}, drag] = useDrag({
         item: { type: ItemTypes.LISTITEM, index: props.index },
         collect: monitor => ({
             isDragging: !!monitor.isDragging(),
+            clientOffset: monitor.getClientOffset(),
         }),
     })
     const ref = useRef(null)
@@ -50,6 +51,7 @@ function TodoListItem(props) {
             const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
             // Determine mouse position
             const clientOffset = monitor.getClientOffset();
+            // console.log(clientOffset);
             // Get pixels to the top
             const hoverClientY = clientOffset.y - hoverBoundingRect.top;
             // Only perform the move when the mouse has crossed half of the items height
@@ -71,13 +73,27 @@ function TodoListItem(props) {
             item.index = hoverIndex;
         }
     })
-    const opacity = isDragging ? 0:1;
+    var delay_y = 0;
+    const style = ({isDragging}) => {
+        // console.log(delay_y);
+        return ({
+            boxShadow: isDragging ? "10px 5px 5px rgba(0, 0, 0, .5)":"",
+            translateY: delay_y,
+        });
+    }
+    useEffect(
+        () => {
+            // delay_y = clientOffset.y;
+            // console.log(clientOffset);
+        },
+        [ clientOffset ]
+    );
     drag(drop(ref));
     return (
         <React.Fragment>
-            <div ref={ref} style={{opacity}}>
+            <div ref={ref} style={style({isDragging})}>
                 <ListItem>
-                    <Dehaze />
+                    <Dehaze />{style}
                     <Checkbox
                         checked={props.item.checked}
                         onChange={() => props.handleChecked(props.index)}
@@ -138,7 +154,8 @@ function TodoList() {
     const [textState, setTextState] = useState('');
     const items = itemList.map((item, index) => {
         return (
-            <TodoListItem moveItem={moveItem} item={item} key={item.id} index={index} handleChecked={i => handleChecked(i)} setEdit={(i, state, text) => setEdit(i, state, text)} delete={i => deleteTodo(i)} />
+            <TodoListItem moveItem={moveItem} item={item} key={item.id} index={index} handleChecked={i => handleChecked(i)} 
+            setEdit={(i, state, text) => setEdit(i, state, text)} delete={i => deleteTodo(i)} />
         );
     });
     const addTodo = () => {
