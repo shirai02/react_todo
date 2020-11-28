@@ -90,25 +90,17 @@ function TodoListItem(props) {
                         }}
                     />
                     {props.item.edit ? (
-                        <TextField defaultValue={props.item.text} onChange={event => handleOnChangeText(event)} onKeyDown={event => keyPress(event)} className={classes.textField + ' ' + classes.del_underline} borderBottom={0} />
+                        <TextField defaultValue={props.item.text} onChange={event => handleOnChangeText(event)} onKeyDown={event => keyPress(event)} 
+                        className={classes.textField + ' ' + classes.del_underline} borderBottom={0} />
                     ) : (
-                            <ListItemText primary={props.item.text} />
+                            <ListItemText primary={props.item.text} style={{ textDecoration : props.item.checked ? 'line-through' : 'none' }} onClick={() => props.setEdit(props.index, !props.item.edit, textState)} />
                         )
                     }
                     {props.item.checked ? (
-                        <ButtonGroup aria-label="outlined primary button group">
-                            <Button variant='outlined' onClick={() => props.setEdit(props.index, !props.item.edit, textState)}>
-                                edit
-                            </Button>
-                            <Button color="secondary" style={{ color: red[800] }} onClick={() => props.delete(props.index)}>
+                            <Button color="secondary" variant='outlined' style={{ color: red[800] }} onClick={() => props.delete(props.index)}>
                                 delete
                         </Button>
-                        </ButtonGroup>
-                    ) : (
-                            <Button variant='outlined' onClick={() => props.setEdit(props.index, !props.item.edit, textState)}>
-                                edit
-                            </Button>
-                        )
+                    ) : null
                     }
                 </ListItem>
                 <Divider />
