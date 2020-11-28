@@ -11,7 +11,6 @@ import update from 'immutability-helper';
 import { isMobile } from 'react-device-detect';
 
 //ToDo Grid Layout使う
-//Todo ドラック時のui(useEffect)
 //! classを使用しない
 //! 子要素をmapで展開するならStateは親要素で管理しないとおかしくなる
 
@@ -20,18 +19,16 @@ function TodoListItem(props) {
     const [textState, setTextState] = useState(props.item.text);
     const handleOnChangeText = (event) => {
         setTextState(event.target.value);
-        // console.log(textState);
     }
     const keyPress = (e) => {
         if (e.keyCode === 13) {
             props.setEdit(props.index, false, textState);
         }
     }
-    const [{isDragging, clientOffset}, drag] = useDrag({
+    const [{isDragging}, drag] = useDrag({
         item: { type: ItemTypes.LISTITEM, index: props.index },
         collect: monitor => ({
             isDragging: !!monitor.isDragging(),
-            clientOffset: monitor.getClientOffset(),
         }),
     })
     const ref = useRef(null)
@@ -73,21 +70,9 @@ function TodoListItem(props) {
             item.index = hoverIndex;
         }
     })
-    var delay_y = 0;
-    const style = ({isDragging}) => {
-        // console.log(delay_y);
-        return ({
-            boxShadow: isDragging ? "10px 5px 5px rgba(0, 0, 0, .5)":"",
-            translateY: delay_y,
-        });
-    }
-    useEffect(
-        () => {
-            // delay_y = clientOffset.y;
-            // console.log(clientOffset);
-        },
-        [ clientOffset ]
-    );
+    const style = ({isDragging}) => ({
+        boxShadow: isDragging ? "0px 5px 5px 0px rgba(0, 0, 0, .5)":"",
+    });
     drag(drop(ref));
     return (
         <React.Fragment>
